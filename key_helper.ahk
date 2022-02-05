@@ -5,13 +5,11 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #SingleInstance Force
 
 HoldArray := []
-ClickInterval = 0
+ClickInterval := 0
 
-RemoveToolTip:
-    ToolTip
-    return
+Help()
 
->^,::
+$>^,::
     key := KeyWaitAny()
     toogle := True
     while toogle
@@ -23,14 +21,14 @@ RemoveToolTip:
     }
     return
 
->^.::
+$>^.::
     key := KeyWaitAny()
     HoldArray.Insert(key)
     KeyWait, %key%
     Send, {%key% Down}
     return
 
->^/::
+$>^/::
     toogle := False
     for i,e in HoldArray
         Send, {%e% Up}
@@ -39,22 +37,30 @@ RemoveToolTip:
     SetTimer, RemoveToolTip, -300
     return
 
->^'::
+$>^'::
     InputBox, ClickInterval, Click interval, in millisecond, , 175, 124
     return
 	
->^]::
+$>^]::
     ToolTip % KeyWaitAny()
     SetTimer, RemoveToolTip, -1000
     return
 
->^\::
-    ToolTip % "Click:`t Ctrl + `, then any key`nHold:`t Ctrl + . then any key`nStop:`t Ctrl + /`nInterval:`t Ctrl + '`n `nTest:`t Ctrl + ]`nHelp:`t Ctrl + \`n `nCurrent interval: " . Max(32, ClickInterval)
-    SetTimer, RemoveToolTip, -8000
+$>^\::
+	Help()
     return
 
-KeyWaitAny()
-{
+RemoveToolTip() {
+    ToolTip
+}
+    
+Help() {
+    global ClickInterval
+    ToolTip % "Click:`t Ctrl + `, then any key`nHold:`t Ctrl + . then any key`nStop:`t Ctrl + /`nInterval:`t Ctrl + '`n `nTest:`t Ctrl + ]`nHelp:`t Ctrl + \`n `nCurrent interval: " . Max(32, ClickInterval) . " ms"
+    SetTimer, RemoveToolTip, -8000
+}
+
+KeyWaitAny() {
     global expectMouseClick := True
     global ih := InputHook()
     ih.KeyOpt("{All}", "ES")
